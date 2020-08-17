@@ -28,7 +28,7 @@ sub choose_existing_action {
     # return 0 unless defined $action;
     # return 1 if ( $action eq $action_list[0] );
     $db->exec(
-        qq(update raw_data set status=0 where id in 
+        qq(update raw_file set status=0 where id in 
             (select raw_file_id from section where id=$series_id)
     )
         );

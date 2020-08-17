@@ -115,7 +115,7 @@ ALL: while ( $action ne "\e" ) {
                 next unless $oSeries->set() == 0;
             }
             when ('E') {
-                next unless $oEpisode->set() == 0;
+                next unless $oEpisode->set($episode+1) == 0;
             }
             when ('s') {
                 next unless $oSection->set() == 0;

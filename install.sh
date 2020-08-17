@@ -62,7 +62,10 @@ perl_install MP4::Info
 perl_install Clipboard
 perl_install Const::Fast
 perl_install Term::Screen
+perl_install Term::Choose
 perl_install DBD::MariaDB
 perl_install lib::abs
 perl_install Perl::Critic::Nits
+perl_install Moo
+perl_install MooX::Singleton
 mkdir -pv ~/data
