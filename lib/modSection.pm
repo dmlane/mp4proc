@@ -169,10 +169,14 @@ sub print_sections {
     }
     else {
         for ( $n = 0; $n < @{ $self->{outliers} }; $n++ ) {
-            $scr->display( sprintf( "OUTLIER: Episode %2.2d Duration %s (Average %s)",
-                            $self->{outliers}->[$n]->{episode_number},
-                            to_timestamp( $self->{outliers}->[$n]->{duration} ),
-                            to_timestamp( $self->{outliers}->[$n]->{average} ) ));
+            $scr->display(
+                sprintf(
+                    "OUTLIER: Episode %2.2d Duration %s (Average %s)",
+                    $self->{outliers}->[$n]->{episode_number},
+                    to_timestamp( $self->{outliers}->[$n]->{duration} ),
+                    to_timestamp( $self->{outliers}->[$n]->{average} )
+                )
+            );
         } ## end for ( $n = 0; $n < @{ $self...})
     } ## end else [ if ( @{ $self->{outliers...}})]
     $scr->display( "-" x 80 );

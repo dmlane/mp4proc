@@ -14,7 +14,7 @@ with 'MooX::Singleton';
 has section_handler => ( is => 'rw' );
 
 # array containing all file details
-has file => ( is => 'rw' );
+has file => ( is => 'rw', default => sub { [] } );
 
 # Database handle
 has db => ( is => 'rw' );
@@ -39,6 +39,17 @@ has num_sections => ( is => 'rw', default => 0 );
 
 # Value used to indicate last record
 my $high_values = 'ZZZZZZZZZZZ';
+
+sub delete {
+    my ($self) = @_;
+    $self->db->exec(qq(delete from raw_file where name= '$self->{name}'));
+    splice( @{$self->{file}},$self->{ptr},1); 
+    $self->max_ptr( $self->{max_ptr} - 1 );
+    my $n=$self->{ptr};
+    $self->ptr($self->{ptr}+1);
+    $self->set($n);
+
+} ## end sub delete
 
 =head2 insert
 Create a single raw_file record
@@ -129,7 +140,7 @@ sub fetch {
     printf( " %d files loaded", $max_ptr );
     $raw_files->[$max_ptr] = { file => $high_values };
     $self->file($raw_files);
-    $self->set(0);
+    $self->set(0) unless $max_ptr==0;
     $self->max_ptr($max_ptr);
 } ## end sub fetch
 
@@ -157,10 +168,11 @@ Move the pointer back 1
 =cut
 
 sub set {
-    my ( $self, $new_value ) = @_;
+    my ( $self, $new_value ) = @_; 
     return 0 if $new_value == $self->{ptr};
 
     # Don't allow going beyond boundaries
+    $oFileHandler->link_file( $self->{name}, 0 ) if defined $self->{name};
     $new_value = 0 if $self->{ptr} < 0;
     $new_value = $self->{max_ptr} if $self->{ptr} > $self->{max_ptr};
     $self->ptr($new_value);
@@ -172,6 +184,7 @@ sub set {
     $video_length = $self->file->[$new_value]->{video_length};
     $oSection->fetch_raw_sections();
     $oSection->print_sections();
+    $oFileHandler->link_file( $self->{name}, 1 );
 } ## end sub set
 
 sub prev {
@@ -181,6 +194,9 @@ sub prev {
 
 sub next {
     my $self = shift;
+    $self->db->exec(
+        qq(update raw_file set status=2 where raw_id=$raw_id)
+    );
     $self->set( $self->{ptr} + 1 );
 }
 

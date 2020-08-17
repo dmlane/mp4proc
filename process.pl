@@ -14,12 +14,11 @@ use modSection;
 use modScreen;
 my $testOrProd = "PROD";
 use experimental qw(switch );
-$db       = modDB->instance( level => "$testOrProd" );
-$scr      = modScreen->instance();                       #$testOrProd="TEST";
-$oSection = modSection->instance();
-$oRawData = modRawData->instance();
-
-my $mp4      = modFileHandler->instance();
+$db           = modDB->instance( level => "$testOrProd" );
+$scr          = modScreen->instance();                       #$testOrProd="TEST";
+$oFileHandler = modFileHandler->instance();
+$oSection     = modSection->instance();
+$oRawData     = modRawData->instance();
 my $oProgram = modProgram->instance();
 my $oSeries  = modSeries->instance();
 my $oEpisode = modEpisode->instance();
@@ -30,8 +29,8 @@ sub s01_initialise {
     # Enable database
     # Enable screen handler
     # Fetch eligible files from the database
-    # Read mp4 files from the filesystem
-    $mp4->fetch();
+    # Read  oFileHandleres from the filesystem
+    $oFileHandler->fetch();
 
     # Add new mp4 files to rhe database
     if ( $oRawData->add_new() > 0 ) {
@@ -61,7 +60,7 @@ ALL: while ( $action ne "\e" ) {
             $oRawData->{name}, $program,
             sprintf( "%2.2d", $series ),
             sprintf( "%2.2d", $episode ),
-            sprintf( "%2.2d", $section+1 )
+            sprintf( "%2.2d", $section + 1 )
         );
 
         # @p   = ( '??', '??', '??' );
@@ -102,6 +101,10 @@ ALL: while ( $action ne "\e" ) {
                     }
                     when ('P') {
                         $oRawData->prev();
+                    }
+                    when ('D') {
+                        $oFileHandler->remove_file();
+                        $oRawData->delete();
                     }
                 } ## end given
             } ## end when ('F')
