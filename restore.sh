@@ -11,5 +11,6 @@ if [ ! -f $link ] ;then
 fi
 
 echo Importing
-mysql $admin_user videos <$link || echo Import failed
+#mysql $admin_user videos <$link || echo Import failed
+mysql $admin_user test <$link || echo Import failed
 echo Done

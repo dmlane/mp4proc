@@ -194,9 +194,9 @@ sub prev {
 
 sub next {
     my $self = shift;
-    $self->db->exec(
-        qq(update raw_file set status=2 where id=$raw_id)
-    );
+    # $self->db->exec(
+    #     qq(update raw_file set status=2 where id=$raw_id)
+    # );
     $self->set( $self->{ptr} + 1 );
 }
 
