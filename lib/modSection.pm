@@ -103,6 +103,7 @@ sub new_section {
     $db->exec($stmt);
     $self->fetch_episode_sections($episode_id);
     $self->fetch_raw_sections($raw_id);
+    $self->fetch_outliers();
     $db->disconnect(0);    # Commit
     $section = $section_number;
 } ## end sub new_section
