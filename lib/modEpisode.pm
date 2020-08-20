@@ -41,10 +41,10 @@ sub choose_existing_action {
 
 sub set {
     my ( $self, $new_val ) = @_;
-    unless ( defined $new_val ) {
+    #unless ( defined $new_val ) {
         $new_val = $scr->number(
-            sprintf( "Program <B>%s-S%2.2d-</B> - which episode", $program, $series ), 1 );
-    }
+            sprintf( "Program <B>%s-S%2.2d-</B> - which episode", $program, $series ), $new_val );
+    #}
     return 0 if $new_val == $episode;
     if ( $new_val < 1 or $new_val > $max_episode ) {
         $scr->acknowledge(

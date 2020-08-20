@@ -36,6 +36,8 @@ function mac_packages {
 	test -f /usr/local/bin/brew ||\
 		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	brew_install mysql-client /usr/local/bin/mysql link
+	brew_install ffmpeg /usr/local/bin/ffmpeg 
+
 
 }
 
