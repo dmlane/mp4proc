@@ -53,8 +53,8 @@ sub fetch_raw_sections {
 
 sub fetch_outliers {
     my ($self) = @_;
-    my $stmt = qq(select * from outliers where program_name=$program and series=$series
-                    order by episode);
+    my $stmt = qq(select * from outliers where program_name='$program' and series_number=$series
+                    order by episode_number);
     my $result = $db->fetch($stmt);
     $self->outliers($result);
 } ## end sub fetch_outliers
@@ -174,7 +174,7 @@ sub print_sections {
                 sprintf(
                     "OUTLIER: Episode %2.2d Duration %s (Average %s)",
                     $self->{outliers}->[$n]->{episode_number},
-                    to_timestamp( $self->{outliers}->[$n]->{duration} ),
+                    to_timestamp( $self->{outliers}->[$n]->{outlier} ),
                     to_timestamp( $self->{outliers}->[$n]->{average} )
                 )
             );
