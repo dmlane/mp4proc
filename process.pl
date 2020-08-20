@@ -73,7 +73,7 @@ ALL: while ( $action ne "\e" ) {
         if ( $series != -1 ) {
 
             # $p[1] = sprintf( "%2.2d", $series );
-            $msg = "$msg &Episode";
+            $msg = "$msg &Episode &delete";
         }
         if ( $episode != -1 ) {
 
@@ -115,10 +115,13 @@ ALL: while ( $action ne "\e" ) {
                 next unless $oSeries->set() == 0;
             }
             when ('E') {
-                next unless $oEpisode->set($episode+1) == 0;
+                next unless $oEpisode->set( $episode + 1 ) == 0;
             }
             when ('s') {
                 next unless $oSection->set() == 0;
+            }
+            when ('d') {
+                $oEpisode->remove();
             }
         } ## end given
     } ## end ALL: while ( $action ne "\e" )

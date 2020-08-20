@@ -186,8 +186,8 @@ sub print_sections {
 sub set {
     my ($self) = @_;
     my $new_val = $section + 1;
-    my $start_time = $scr->get_timestamp( "Start time", "00:00:00.000" );
-    my $end_time   = $scr->get_timestamp( "End time",   $video_length );
+    my $start_time = $scr->get_timestamp( "Episode $episode: Start time", "00:00:00.000" );
+    my $end_time   = $scr->get_timestamp( "Episode $episode: $start_time -> End time",   $video_length );
     return 1 if $self->check_overlap( $start_time, $end_time );
     my $msg = sprintf( "Section %d %s to %s", $new_val, $start_time, $end_time );
     return 1 unless $scr->acknowledge($msg) == 0;

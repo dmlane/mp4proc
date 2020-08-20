@@ -17,6 +17,19 @@ sub fetch {
     return $db->fetch_row($stmt);
 } ## end sub fetch
 
+sub remove {
+    my ($self) = @_;
+    my $x = $scr->number("Program $program series $series - which episode delete?");
+    if ( defined $x ) {
+        $db->exec(
+            qq(delete from episode where id in (
+            select episode_id from videos where program_name='$program'
+            and series_number=$series and episode_number=$x )
+            )
+        );
+    } ## end if ( defined $x )
+} ## end sub remove
+
 sub choose_existing_action {
 
     # Already exists - choose what to do .........
@@ -28,7 +41,7 @@ sub choose_existing_action {
     # return 0 unless defined $action;
     # return 1 if ( $action eq $action_list[0] );
     # $db->exec(
-    #     qq(update raw_file set status=0 where id in 
+    #     qq(update raw_file set status=0 where id in
     #         (select raw_file_id from section where id=$series_id)
     # )
     #     );
@@ -41,9 +54,12 @@ sub choose_existing_action {
 
 sub set {
     my ( $self, $new_val ) = @_;
+
     #unless ( defined $new_val ) {
-        $new_val = $scr->number(
-            sprintf( "Program <B>%s-S%2.2d-</B> - which episode", $program, $series ), $new_val );
+    $new_val
+        = $scr->number( sprintf( "Program <B>%s-S%2.2d-</B> - which episode", $program, $series ),
+        $new_val );
+
     #}
     return 0 if $new_val == $episode;
     if ( $new_val < 1 or $new_val > $max_episode ) {
