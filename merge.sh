@@ -22,7 +22,8 @@ MP4_DIR=$NAS_BASE/Videos/Import
 test -d $MP4_DIR || fail "MP4_DIR $MP4_DIR not found"
 #---------------------------------------------
 n=0
-while getopts "i:p:"
+filter=""
+while getopts "i:p:S:e:"
 do
 	case $c in
 		i)	inputs="$inputs -i $OPTARG"
@@ -30,18 +31,23 @@ do
 			:;;
 		p)	program=$OPTARG;;
 		S)	series=$OPTARG;;
-		E)	episode=$OPTARG;;
+		e)	episode=$OPTARG;;
 	esac
 done
 shift $((OPTIND-1))
 test $# -lt 1 && fail "No output file provided"
 output_file=$1
+test -z "$program" && fail "No program supplied"
+test -z "$series" && fail "No series supplied"
+test -z "$episode" && fail "No episode supplied"
 
-INPUT_FOLDER=~/work/Videos/Split
+
+SPLIT_FOLDER=~/work/Videos/Split
 OUTPUT_FOLDER=~/work/Videos/Processed
 WORK_FOLDER=~/work/tmp
 preset=medium
 crf=22
+mkdir -p $SPLIT_FOLDER $OUTPUT_FOLDER $WORK_FOLDER
 
 episode_id=$(( ($series*100)+$episode ))
 ((series+=0))
@@ -50,7 +56,7 @@ title=${output_file%.mp4}
 
 # Define metadata
 # 
-cat >${INPUT_FOLDER}/metadata.txt<<EOF
+cat >${SPLIT_FOLDER}/metadata.txt<<EOF
 ;FFMETADATA1
 major_brand=isom
 minor_version=512
@@ -76,7 +82,7 @@ if [ $? -ne 0 ] ; then
 fi
 
 # Add metadata
-ffmpeg -i $NoMeta -i ${INPUT_FOLDER}/metadata.txt -map_metadata 1 -c:v copy -c:a copy ${WORK_FOLDER}/$output_file
+ffmpeg -i $NoMeta -i ${SPLIT_FOLDER}/metadata.txt -map_metadata 1 -c:v copy -c:a copy ${WORK_FOLDER}/$output_file
 if [ $? -ne 0 ] ; then
 	return 2
 fi
