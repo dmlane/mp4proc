@@ -24,6 +24,7 @@ CREATE TABLE if not exists episode (
   series_id int(11) unsigned NOT NULL, 
   episode_number int(3) unsigned NOT NULL, 
   status int(2) default 0,
+  host varchar(32)
   PRIMARY KEY (id), 
   UNIQUE KEY series_id (series_id, episode_number), 
   CONSTRAINT episode_ibfk_1 FOREIGN KEY (series_id) REFERENCES series (id) ON DELETE CASCADE
