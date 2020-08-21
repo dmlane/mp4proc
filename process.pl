@@ -94,7 +94,7 @@ ALL: while ( $action ne "\e" ) {
                 my $fmsg = "";
                 if   ( $rsection_count == 0 ) { $fmsg = "&Delete"; }
                 else                          { $fmsg = "&Forward"; }
-                $fmsg = "$fmsg &Previous &Search";
+                $fmsg = "$fmsg &Previous &Search (files remaining in set=$files_remaining";
                 given ( $scr->get_char($fmsg) ) {
                     when ('F') {
                         $oRawData->next();

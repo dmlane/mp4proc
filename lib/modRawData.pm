@@ -43,12 +43,11 @@ my $high_values = 'ZZZZZZZZZZZ';
 sub delete {
     my ($self) = @_;
     $self->db->exec(qq(delete from raw_file where name= '$self->{name}'));
-    splice( @{$self->{file}},$self->{ptr},1); 
+    splice( @{ $self->{file} }, $self->{ptr}, 1 );
     $self->max_ptr( $self->{max_ptr} - 1 );
-    my $n=$self->{ptr};
-    $self->ptr($self->{ptr}+1);
+    my $n = $self->{ptr};
+    $self->ptr( $self->{ptr} + 1 );
     $self->set($n);
-
 } ## end sub delete
 
 =head2 insert
@@ -139,8 +138,21 @@ sub fetch {
     my $max_ptr = @{$raw_files};
     printf( " %d files loaded", $max_ptr );
     $raw_files->[$max_ptr] = { file => $high_values };
+    my $lfn = "#";
+    my $fn;
+    my $remaining;
+
+    for ( my $n = @{$raw_files} - 1; $n >= 0; $n-- ) {
+        $fn = substr( $raw_files->[$n]->{name}, 0, 21 );
+        if ( $fn ne $lfn ) {
+            $lfn       = $fn;
+            $remaining = -1;
+        }
+        $remaining++;
+        $raw_files->[$n]->{remaining} = $remaining;
+    } ## end for ( my $n = @{$raw_files...})
     $self->file($raw_files);
-    $self->set(0) unless $max_ptr==0;
+    $self->set(0) unless $max_ptr == 0;
     $self->max_ptr($max_ptr);
 } ## end sub fetch
 
@@ -168,7 +180,7 @@ Move the pointer back 1
 =cut
 
 sub set {
-    my ( $self, $new_value ) = @_; 
+    my ( $self, $new_value ) = @_;
     return 0 if $new_value == $self->{ptr};
 
     # Don't allow going beyond boundaries
@@ -177,6 +189,7 @@ sub set {
     $new_value = $self->{max_ptr} if $self->{ptr} > $self->{max_ptr};
     $self->ptr($new_value);
     $self->id( $self->file->[$new_value]->{raw_file_id} );
+    $files_remaining = $self->file->[$new_value]->{remaining};
     $self->name( $self->file->[$new_value]->{file} );
     $self->status( $self->file->[$new_value]->{raw_status} );
     $self->num_sections( $self->file->[$new_value]->{section_count} );
@@ -194,11 +207,12 @@ sub prev {
 
 sub next {
     my $self = shift;
+
     # $self->db->exec(
     #     qq(update raw_file set status=2 where id=$raw_id)
     # );
     $self->set( $self->{ptr} + 1 );
-}
+} ## end sub next
 
 =head2 BUILD
 Constructor for class

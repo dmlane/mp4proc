@@ -98,9 +98,9 @@ sub next {
 sub remove_file {
     my ($self) = @_;
     my $fn = $oRawData->file->[ $oRawData->{ptr} ]->{file};
-    my $mp4_name  = sprintf( "%s/%s", $self->{mp4_dir}, $fn );
+    my $mp4_name = sprintf( "%s/%s", $self->{mp4_dir}, $fn );
     rename $mp4_name, $mp4_name . ".remove" or die "Failed to 'delete' $mp4_name";
-    $self->link_file($fn,0);
+    $self->link_file( $fn, 0 );
     printf " deleted\n";
 } ## end sub remove_file
 
@@ -113,5 +113,5 @@ sub link_file {
         system("ln $mp4_name $link_name") == 0
             or die "Cannot ln $mp4_name to $link_name";
     }
-} ## end sub process_file
+} ## end sub link_file
 1;

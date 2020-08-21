@@ -5,6 +5,7 @@ use lib::abs -soft => qw(. lib);
 use Moo;
 with 'MooX::Singleton';
 use modData;
+has series => ( is => 'rw' );
 
 # Pointer to classes
 # has DB  => ( is => 'rw', required => 0 );
@@ -22,7 +23,7 @@ sub set {
         $new_val = $scr->number( "Program <B>$program</B> - which series", 1 );
     }
     return 1 unless defined $new_val;
-    return 0 if $new_val == $series;
+    return 0 if $new_val == $self->{series};
     $max_episode = -1;
 
     # Check if value exists
@@ -40,12 +41,13 @@ sub set {
             qq(insert into series (program_id,series_number,max_episodes)
                 values($program_id,$new_val,$max_episode))
         );
-        $result = $self->fetch( $new_val );
+        $result = $self->fetch($new_val);
     } ## end unless ( defined $result )
     $series_id   = $result->{id};
     $max_episode = $result->{max_episodes};
     $series      = $new_val;
-    $episode_id  = -1;
+    $self->series($series);
+    $episode_id = -1;
     return 0;
 } ## end sub set
 1;

@@ -157,7 +157,7 @@ sub print_sections {
             $msg = $msg . colored( $arr[$m], $color[$m] ) . " ";
         } ## end for ( my $m = 0; $m < @arr...)
         $scr->display($msg);
-        $episode_length = timeadd( timediff( $arr[3], $arr[2] ), $episode_length );
+        $episode_length = timeadd( timediff( $arr[-1], $arr[-2] ), $episode_length );
     } ## end for ( $n = 0; $n < @{ $self...})
     $scr->display("Length of episode = $episode_length");
 

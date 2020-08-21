@@ -84,6 +84,17 @@ from
   left outer join episode c on c.series_id = b.id 
   left outer join section d on d.episode_id = c.id 
   left outer join raw_file e on e.id = d.raw_file_id;
+
+drop view if exists summary;
+create view summary as 
+select a.name program_name, b.series_number, c.episode_number, sum(d.end_time-d.start_time) duration
+ from program a
+  left outer join series b on b.program_id = a.id 
+  left outer join episode c on c.series_id = b.id 
+  left outer join section d on d.episode_id = c.id 
+group by a.name,b.series_number,c.episode_number;
+
+
 drop view if exists orphan_mp4;
 create view orphan_mp4 as 
 select 

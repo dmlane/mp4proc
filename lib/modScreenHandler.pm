@@ -181,7 +181,7 @@ sub ctrl_c {
 sub get_timestamp {
     my ( $self, $prompt, $default_value ) = @_;
     my $value       = "";
-    my $full_prompt = sprintf( "%s [%s]: (Clipboard or ctrl-c):", $prompt, $default_value );
+    my $full_prompt = sprintf( "%s [%s]: (Clipboard or ctrl-c):", colored($prompt,"white"), colored($default_value,"yellow") );
     printf("\r$full_prompt");
     Clipboard->copy("0000000000");
     select()->flush();
