@@ -81,20 +81,21 @@ ALL: while ( $action ne "\e" ) {
             $msg = "$msg &section";
         }
         $msg = "$msg &File";
+        $msg = "$msg ($files_remaining)"
 
-        # $scr->at(
-        #     -3, 0,
-        #     $scr->color_it(
-        #         sprintf( "<B>%s</B>: <B>%s</B>-S<B>%s</B>E<B>%s</B>", $oRawData->{name}, @p )
-        #     )
-        # );
-        $action = $scr->get_char($msg);
+            # $scr->at(
+            #     -3, 0,
+            #     $scr->color_it(
+            #         sprintf( "<B>%s</B>: <B>%s</B>-S<B>%s</B>E<B>%s</B>", $oRawData->{name}, @p )
+            #     )
+            # );
+            $action = $scr->get_char($msg);
         given ($action) {
             when ('F') {
                 my $fmsg = "";
                 if   ( $rsection_count == 0 ) { $fmsg = "&Delete"; }
                 else                          { $fmsg = "&Forward"; }
-                $fmsg = "$fmsg &Previous &Search (files remaining in set=$files_remaining";
+                $fmsg = "$fmsg &Previous &Search (files remaining in set=$files_remaining)";
                 given ( $scr->get_char($fmsg) ) {
                     when ('F') {
                         $oRawData->next();

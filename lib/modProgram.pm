@@ -47,6 +47,10 @@ sub set {
     # Get primary key
     $program_id = $db->fetch_number(qq(select id from program where name='$new_val'));
     $program    = $new_val;
+    $series=-1;
+    $episode=-1;
+    $section=-1;
+
     return;
 } ## end sub set
 
