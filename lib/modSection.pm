@@ -31,7 +31,7 @@ sub fetch_episode_sections {
         select  program_name, series_number,episode_number,section_number,
             start_time,end_time,file_name,max_episodes
             from videos
-            where episode_id=$episode_id
+            where episode_id=$episode_id and file_name is not null
         order by section_number);
     my $result = $db->fetch($stmt);
     $self->episode_arr($result);
