@@ -137,13 +137,13 @@ sub fetch {
     );
     my $max_ptr = @{$raw_files};
     printf( " %d files loaded", $max_ptr );
-    $raw_files->[$max_ptr] = { file => $high_values };
+    $raw_files->[$max_ptr] = { file => $high_values,k1=>$high_values };
     my $lfn = "#";
     my $fn;
     my $remaining;
 
     for ( my $n = @{$raw_files} - 1; $n >= 0; $n-- ) {
-        $fn = substr( $raw_files->[$n]->{name}, 0, 21 );
+        $fn =  $raw_files->[$n]->{k1};
         if ( $fn ne $lfn ) {
             $lfn       = $fn;
             $remaining = -1;
