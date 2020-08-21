@@ -18,13 +18,21 @@ has outliers    => ( is => 'rw', default => sub { [] } );
 
 sub fetch_episode_sections {
     my ($self) = @_;
-    my $stmt = qq(
-        select  a.id section_id,a.start_time,a.end_time,a.section_number,
-                b.name
-         from section a
-        left outer join raw_file b on b.id=a.raw_file_id
-        where a.episode_id=$episode_id
-        order by a.section_number);
+    my $stmt;
+
+    # $stmt = qq(
+    #     select  a.id section_id,a.start_time,a.end_time,a.section_number,
+    #             b.name
+    #      from section a
+    #     left outer join raw_file b on b.id=a.raw_file_id
+    #     where a.episode_id=$episode_id
+    #     order by a.section_number);
+    $stmt = qq(
+        select  program_name, series_number,episode_number,section_number,
+            start_time,end_time,file_name,max_episodes
+            from videos
+            where episode_id=$episode_id
+        order by section_number);
     my $result = $db->fetch($stmt);
     $self->episode_arr($result);
     return @{$result};
@@ -117,16 +125,28 @@ sub print_sections {
     my ( @arr, @prev, @color );
 
     $scr->display( "-" x 80 );
-    @prev = ( ("#") x 4 );
+    @prev = ( ("#") x 7 );
     for ( $n = 0; $n < @{ $self->{episode_arr} }; $n++ ) {
+
+        # @arr = (
+        #     sprintf( "%28s", $self->{episode_arr}->[$n]->{name} ),
+        #     sprintf( "%2d",  $self->{episode_arr}->[$n]->{section_number} ),
+        #     $self->{episode_arr}->[$n]->{start_time},
+        #     $self->{episode_arr}->[$n]->{end_time}
+        # );
         @arr = (
-            sprintf( "%28s", $self->{episode_arr}->[$n]->{name} ),
-            sprintf( "%2d",  $self->{episode_arr}->[$n]->{section_number} ),
+            sprintf( "%28s", $self->{episode_arr}->[$n]->{file_name} ),
+            $self->{episode_arr}->[$n]->{program_name},
+            sprintf( "%2d", $self->{episode_arr}->[$n]->{series_number} ),
+            sprintf( "%2d (of %2d)",
+                $self->{episode_arr}->[$n]->{episode_number},
+                $self->{episode_arr}->[$n]->{max_episodes} ),
+            sprintf( "%2d", $self->{episode_arr}->[$n]->{section_number} ),
             $self->{episode_arr}->[$n]->{start_time},
             $self->{episode_arr}->[$n]->{end_time}
         );
         $msg = colored( "Episode", "blue" ) . ": ";
-        for ( my $m = 0; $m < 4; $m++ ) {
+        for ( my $m = 0; $m < @arr; $m++ ) {
             if ( $arr[$m] eq $prev[$m] ) {
                 $color[$m] = "green";
             }
@@ -135,7 +155,7 @@ sub print_sections {
                 $prev[$m]  = $arr[$m];
             }
             $msg = $msg . colored( $arr[$m], $color[$m] ) . " ";
-        } ## end for ( my $m = 0; $m < 4...)
+        } ## end for ( my $m = 0; $m < @arr...)
         $scr->display($msg);
         $episode_length = timeadd( timediff( $arr[3], $arr[2] ), $episode_length );
     } ## end for ( $n = 0; $n < @{ $self...})
@@ -187,7 +207,8 @@ sub set {
     my ($self) = @_;
     my $new_val = $section + 1;
     my $start_time = $scr->get_timestamp( "Episode $episode: Start time", "00:00:00.000" );
-    my $end_time   = $scr->get_timestamp( "Episode $episode: $start_time -> End time",   $video_length );
+    my $end_time
+        = $scr->get_timestamp( "Episode $episode: $start_time -> End time", $video_length );
     return 1 if $self->check_overlap( $start_time, $end_time );
     my $msg = sprintf( "Section %d %s to %s", $new_val, $start_time, $end_time );
     return 1 unless $scr->acknowledge($msg) == 0;
