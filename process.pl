@@ -80,16 +80,9 @@ ALL: while ( $action ne "\e" ) {
             # $p[2] = sprintf( "%2.2d", $episode );
             $msg = "$msg &section";
         }
-        $msg = "$msg &File";
-        $msg = "$msg ($files_remaining)"
-
-            # $scr->at(
-            #     -3, 0,
-            #     $scr->color_it(
-            #         sprintf( "<B>%s</B>: <B>%s</B>-S<B>%s</B>E<B>%s</B>", $oRawData->{name}, @p )
-            #     )
-            # );
-            $action = $scr->get_char($msg);
+        $msg    = "$msg &File";
+        $msg    = "$msg ($files_remaining)";
+        $action = $scr->get_char($msg);
         given ($action) {
             when ('F') {
                 my $fmsg = "";
