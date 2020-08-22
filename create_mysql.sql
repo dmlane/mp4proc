@@ -160,3 +160,33 @@ INNER JOIN
 WHERE  
 t1.program_name in (select program_name from videos where episode_status=0)
 ;
+
+DELIMITER //
+create or replace trigger ai_section 
+  after insert on section
+  for each row
+begin
+  if NEW.status = 0 then
+    update episode set status=0 where id=NEW.episode_id;
+  end if;
+end; //
+DELIMITER ;
+
+DELIMITER //
+create trigger au_section 
+  after update on section
+  for each row
+begin
+  if new.status = 0 then
+    update episode set status=0 where id=new.episode_id;
+  end if;
+end; //
+DELIMITER ;
+DELIMITER //
+create trigger bd_section
+  before delete on section
+  for each row
+  update episode set status=0 where id=old.episode_id;
+//
+DELIMITER ;
+

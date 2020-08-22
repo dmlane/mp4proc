@@ -67,8 +67,12 @@ perl_install Term::Screen
 perl_install Term::Choose
 perl_install DBD::MariaDB
 perl_install lib::abs
-perl_install Perl::Critic::Nits
+#perl_install Perl::Critic::Nits
 perl_install Moo
 perl_install MooX::Singleton
+perl_install Params::ValidationCompiler
 perl_install Log::Log4perl
-mkdir -pv ~/data
+perl_install Log::Dispatch::File 
+
+mkdir -pv ~/data ~/LOGS 2>/dev/null
+

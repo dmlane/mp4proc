@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
 use strict;
-use strict;
+use Sys::Hostname;
+use Log::Log4perl qw(get_logger);
 use lib::abs -soft => qw(. lib);
 use modDB;
 use Cwd 'abs_path';
-use Sys::Hostname;
 use modFileHandler;
 
 # Screen
@@ -16,22 +16,39 @@ my $host      = hostname;
 my $scriptdir = abs_path($0);
 
 $scriptdir =~ s/\/[^\/]*$//;
+Log::Log4perl->init( $scriptdir . "/log4j.conf" );
+my $logger = get_logger("jobsched");
+$logger->info("Start of run");
 
 sub run_script {
     my $script = shift;
-    system($script);
-    if ( $? == -1 ) {
-        die "failed to execute: $!\n";
-    }
-    elsif ( $? & 127 ) {
-        printf "child died with signal %d, %s coredump\n",
-            ( $? & 127 ), ( $? & 128 ) ? 'with' : 'without';
-        return 1;
-    }
-    else {
-        printf "child exited with value %d\n", $? >> 8;
-        return 1;
-    }
+    $logger->info("Running script:");
+    $logger->info($script);
+
+    # system($script);
+    # if ( $? == -1 ) {
+    #     $logger->logdie("Failed to execute: $!\n");
+    # }
+    # elsif ( $? & 127 ) {
+    #     $logger->error(
+    #         sprintf(
+    #             "child died with signal %d, %s coredump\n",
+    #             ( $? & 127 ),
+    #             ( $? & 128 ) ? 'with' : 'without'
+    #         )
+    #     );
+    #     return 1;
+    # } ## end elsif ( $? & 127 )
+    # else {
+    #     if ( $? >> 8 != 0 ) {
+    #         $logger->error( sprintf( "child exited with value %d\n", $? >> 8 ) );
+    #         return 1;
+    #     }
+    # } ## end else [ if ( $? == -1 ) ]
+    my $output = qx/$script/;
+    return 1 unless defined $output;
+    $logger->info($output);
+    return 1 unless ( $output =~ /\+\+\+\+\+\+\+\+\+\+/ );
     return 0;
 } ## end sub run_script
 
@@ -46,14 +63,20 @@ sub process_section {
     my $err_count  = 0;
     my $ok_count   = 0;
     my $info       = $db->fetch(
-        qq(select  section_id, section_number, start_time, end_time,
-    		video_length,file_name,program_name,series_number,episode_number
-    		from videos
-    		where episode_id=$episode_id and status < 1
-    		)
+        qq(
+    	select 	a.name program_name,b.series_number,c.episode_number,d.id section_id,
+    			d.section_number,d.start_time,d.end_time,d.status,
+                e.name file_name,e.video_length
+    	from program a 
+			 left outer join series b on b.program_id = a.id 
+			 left outer join episode c on c.series_id = b.id 
+			 left outer join section d on d.episode_id = c.id 
+			 left outer join raw_file e on e.id = d.raw_file_id
+			 where c.id=$episode_id and d.status=0;
+    	)
     );
 
-    # Make sure we process on same machineget_section_name($info->[$n]);
+    # Make sure we process all sections and episode on same machine
     #  ......
     $db->exec(qq(update episode set host='$host' where id=$episode_id));
     for ( my $n = 0; $n < @{$info}; $n++ ) {
@@ -70,10 +93,10 @@ sub process_section {
         $err_count++;
     } ## end for ( my $n = 0; $n < @...)
     if ( $err_count > 0 ) {
-        if   ( $ok_count > 0 ) { $db->disconnect(0); }    # >1 section OK
-        else                   { $db->disconnect(1); }    # Rollback
+        if ( $ok_count == 0 ) { $db->disconnect(1); }    # Rollback
         return 1;
     }
+    $db->disconnect(0);                                  # >1 section OK
     return 0;
 } ## end sub process_section
 
@@ -102,7 +125,7 @@ sub process_episode {
         $result->[0]->{episode_number}
     );
     if (run_script(
-            qq($scriptdir/merge.sh $ifiles -p $result->[0]->{program_name} -S $result->[0]->{series_number} -e $result->[0]->{episode_number} )
+            qq($scriptdir/merge.sh $ifiles -p $result->[0]->{program_name} -S $result->[0]->{series_number} -e $result->[0]->{episode_number} $ofile )
         ) == 0
         )
     {
@@ -117,15 +140,26 @@ sub lock_episode {
     # Stupid MariaDB doesn't have skip locked, so we have to fudge it.
     #--> get next 3 records and try to lock each 1 in turn
     $possible = $db->fetch(
-        qq(select id from episode where status<1 and coalesce(host,'$host')
+        qq(select id from episode where status<1 and coalesce(host,'$host')='$host'
     		order by id limit 3
     		)
+    );
+    $logger->debug(
+        sprintf(
+            "Selected following possible episode ids %d, %d and %d",
+            $possible->[0]->{id},
+            $possible->[1]->{id},
+            $possible->[2]->{id}
+        )
     );
     for ( my $n = 0; $n < @{$possible}; $n++ ) {
         $id     = $possible->[$n]->{id};
         $result = $db->fetch_number(qq(select id from episode where id=$id for update nowait));
-        return $id if ( defined $result );
-    }
+        if ( defined $result ) {
+            $logger->debug("Locked and selected episode_id <$id>");
+            return $id;
+        }
+    } ## end for ( my $n = 0; $n < @...)
     return;
 } ## end sub lock_episode
 

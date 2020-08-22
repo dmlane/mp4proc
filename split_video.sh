@@ -20,7 +20,7 @@ function usage {
 	}
 function fail {
 	echo "$*"
-	echo "     aborting!"
+	echo "     aborting ??????????"
 	exit 2
 	}
 function test_time {
@@ -117,4 +117,4 @@ if [ $? -ne 0 ] ; then
 	fail "Could not move $tmp_file to $output_file"
 fi
 
-
+echo "$output_file created successfully ++++++++++"
