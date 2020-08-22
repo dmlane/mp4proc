@@ -35,7 +35,7 @@ while getopts "i:p:S:e:" c
 do
 	case $c in
 		i)	inputs="$inputs -i $SPLIT_FOLDER/$OPTARG"
-			filter="$filter[${n}:v:0] [${n}:a:0] "
+			filter="$filter[${file_count}:v:0] [${file_count}:a:0] "
 			(( file_count++ ))
 			:;;
 		p)	program=$OPTARG;;
@@ -99,7 +99,7 @@ test $? -ne 0 && fail "Failed to add metadata"
 
 mkdir -p $NAS_BASE/Unix/Videos/Processed/$program
 
-mv -f ${WORK_FOLDER}/$output_file $NAS_BASE/Videos/Processed/$program/
+mv -f ${WORK_FOLDER}/$output_file $NAS_BASE/UnixVideos/Processed/$program/
 
 test $? -ne 0 && fail "Unable to move result to $NAS_BASE/Videos/Processed/$program/"
 echo "$output_file created successfully ++++++++++"
