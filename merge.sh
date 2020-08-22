@@ -86,21 +86,27 @@ function FFMPEG {
 }
 # Create version without metadata
 NoMeta=${WORK_FOLDER}/${title}_noMeta.mp4
+work_mp4=${WORK_FOLDER}/work.mp4
 rm -f $NoMeta 2>/dev/null
-
-FFMPEG -loglevel warning -y $inputs -filter_complex "$filter" \
-		 -map "[v]" -map "[a]" \
-		 -c:v libx264 -preset $preset -crf $crf -c:a aac -b:a 160k $NoMeta
-test $? -ne 0 && fail "Merge failed"
+if [ ! -f $NoMeta ] ; then
+	FFMPEG -loglevel warning -y $inputs -filter_complex "$filter" \
+			 -map "[v]" -map "[a]" \
+			 -c:v libx264 -preset $preset -crf $crf -c:a aac -b:a 160k $work_mp4
+	test $? -ne 0 && fail "Merge failed"
+	mv -v  $work_mp4 $NoMeta
+fi
 
 # Add metadata
-FFMPEG -i $NoMeta -y -i ${SPLIT_FOLDER}/metadata.txt -map_metadata 1 -c:v copy -c:a copy ${WORK_FOLDER}/$output_file
-test $? -ne 0 && fail "Failed to add metadata"
+if [ ! -f ${WORK_FOLDER}/$output_file ] ; then
+	FFMPEG -i $NoMeta -y -i ${SPLIT_FOLDER}/metadata.txt -map_metadata 1 -c:v copy -c:a copy $work_mp4
+	test $? -ne 0 && fail "Failed to add metadata"
+	mv -v $work_mp4  ${WORK_FOLDER}/$output_file
+fi
 
 PROCDIR=$NAS_BASE/Unix/Videos/Processed/$program
 mkdir -p $PROCDIR
 
-mv -f ${WORK_FOLDER}/$output_file $PROCDIR/
+mv -fv ${WORK_FOLDER}/$output_file $PROCDIR/ 2>&1
 
 test $? -ne 0 && fail "Unable to move result to $PROCDIR/"
 rm -fv $NoMeta

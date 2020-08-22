@@ -133,14 +133,14 @@ sub process_episode {
     } ## end if ( run_script(...))
     $db->disconnect(0);
 } ## end sub process_episode
-
+my $last_key=0;
 sub lock_episode {
     my ( $possible, $result, $id );
 
     # Stupid MariaDB doesn't have skip locked, so we have to fudge it.
     #--> get next 3 records and try to lock each 1 in turn
     $possible = $db->fetch(
-        qq(select id from episode where status<1 and coalesce(host,'$host')='$host'
+        qq(select id from episode where status<1 and coalesce(host,'$host')='$host' and id > $last_key
     		order by id limit 3
     		)
     );
@@ -157,6 +157,7 @@ sub lock_episode {
         $result = $db->fetch_number(qq(select id from episode where id=$id for update nowait));
         if ( defined $result ) {
             $logger->debug("Locked and selected episode_id <$id>");
+			$last_key=$id;
             return $id;
         }
     } ## end for ( my $n = 0; $n < @...)
