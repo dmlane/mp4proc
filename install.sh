@@ -70,4 +70,5 @@ perl_install lib::abs
 perl_install Perl::Critic::Nits
 perl_install Moo
 perl_install MooX::Singleton
+perl_install Log::Log4perl
 mkdir -pv ~/data
