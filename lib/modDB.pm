@@ -40,7 +40,7 @@ sub read_params {
 
     my ($login_path) = @_;
     my %arr;
-    my $cmd = $ENV{"HOME"} . "/dev/videos/my_print_defaults";
+    my $cmd = $ENV{"HOME"} . "/dev/mp4proc/my_print_defaults";
     my $params;
     my $msg;
 

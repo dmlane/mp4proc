@@ -129,7 +129,7 @@ sub process_episode {
         ) == 0
         )
     {
-        $db->exec(qq(update episode set status=1 where episode_id=$episode_id));
+        $db->exec(qq(update episode set status=1 where id=$episode_id));
     } ## end if ( run_script(...))
     $db->disconnect(0);
 } ## end sub process_episode

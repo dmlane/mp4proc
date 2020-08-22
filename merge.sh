@@ -94,14 +94,15 @@ FFMPEG -loglevel warning -y $inputs -filter_complex "$filter" \
 test $? -ne 0 && fail "Merge failed"
 
 # Add metadata
-FFMPEG -i $NoMeta -i ${SPLIT_FOLDER}/metadata.txt -map_metadata 1 -c:v copy -c:a copy ${WORK_FOLDER}/$output_file
+FFMPEG -i $NoMeta -y -i ${SPLIT_FOLDER}/metadata.txt -map_metadata 1 -c:v copy -c:a copy ${WORK_FOLDER}/$output_file
 test $? -ne 0 && fail "Failed to add metadata"
 
 mkdir -p $NAS_BASE/Unix/Videos/Processed/$program
 
-mv -f ${WORK_FOLDER}/$output_file $NAS_BASE/UnixVideos/Processed/$program/
+mv -f ${WORK_FOLDER}/$output_file $NAS_BASE/Unix/Videos/Processed/$program/
 
 test $? -ne 0 && fail "Unable to move result to $NAS_BASE/Videos/Processed/$program/"
+rm -fv $NoMeta
 echo "$output_file created successfully ++++++++++"
 return 0
 
