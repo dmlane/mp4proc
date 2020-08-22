@@ -3,7 +3,7 @@
 os=$(uname -o)
 
 if [ "$os" == "Darwin" ] ; then
-	NAS_BASE=/System/Volumes/Data
+	NAS_BASE=/System/Volumes/Data/Unix
 else
 	NAS_BASE=/Diskstation/Unix
 fi
