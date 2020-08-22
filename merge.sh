@@ -78,24 +78,30 @@ media_type=10
 encoder=Lavf58.20.100
 EOF
 
+ffmpeg=$(type -P ffmpeg)
+
+function FFMPEG {
+	echo $ffmpeg $@
+	$ffmpeg "$@"
+}
 # Create version without metadata
 NoMeta=${WORK_FOLDER}/${title}_noMeta.mp4
 rm -f $NoMeta 2>/dev/null
 
-ffmpeg -loglevel warning -y $inputs -filter_complex "$filter" \
+FFMPEG -loglevel warning -y $inputs -filter_complex "$filter" \
 		 -map "[v]" -map "[a]" \
 		 -c:v libx264 -preset $preset -crf $crf -c:a aac -b:a 160k $NoMeta
-fail "Merge failed"
+test $? -ne 0 && fail "Merge failed"
 
 # Add metadata
-ffmpeg -i $NoMeta -i ${SPLIT_FOLDER}/metadata.txt -map_metadata 1 -c:v copy -c:a copy ${WORK_FOLDER}/$output_file
-fail "Failed to add metadata"
+FFMPEG -i $NoMeta -i ${SPLIT_FOLDER}/metadata.txt -map_metadata 1 -c:v copy -c:a copy ${WORK_FOLDER}/$output_file
+test $? -ne 0 && fail "Failed to add metadata"
 
-mkdir -p $NAS_BASE/Videos/Processed/$program
+mkdir -p $NAS_BASE/Unix/Videos/Processed/$program
 
 mv -f ${WORK_FOLDER}/$output_file $NAS_BASE/Videos/Processed/$program/
 
-test $? -eq 0 || fail "Unable to move result to $NAS_BASE/Videos/Processed/$program/"
+test $? -ne 0 && fail "Unable to move result to $NAS_BASE/Videos/Processed/$program/"
 echo "$output_file created successfully ++++++++++"
 return 0
 
