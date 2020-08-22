@@ -97,11 +97,12 @@ test $? -ne 0 && fail "Merge failed"
 FFMPEG -i $NoMeta -y -i ${SPLIT_FOLDER}/metadata.txt -map_metadata 1 -c:v copy -c:a copy ${WORK_FOLDER}/$output_file
 test $? -ne 0 && fail "Failed to add metadata"
 
-mkdir -p $NAS_BASE/Unix/Videos/Processed/$program
+PROCDIR=$NAS_BASE/Unix/Videos/Processed/$program
+mkdir -p $PROCDIR
 
-mv -f ${WORK_FOLDER}/$output_file $NAS_BASE/Unix/Videos/Processed/$program/
+mv -f ${WORK_FOLDER}/$output_file $PROCDIR/
 
-test $? -ne 0 && fail "Unable to move result to $NAS_BASE/Videos/Processed/$program/"
+test $? -ne 0 && fail "Unable to move result to $PROCDIR/"
 rm -fv $NoMeta
 echo "$output_file created successfully ++++++++++"
 return 0
