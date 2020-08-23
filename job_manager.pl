@@ -11,9 +11,10 @@ use modFileHandler;
 use modScreen;
 my $testOrProd = "PROD";
 use experimental qw(switch );
-my $db        = modDB->instance( level => "$testOrProd" );
-my $host      = hostname;
-my $scriptdir = abs_path($0);
+my $db               = modDB->instance( level => "$testOrProd" );
+my $host             = hostname;
+my $scriptdir        = abs_path($0);
+my $script_err_count = 0;
 
 $scriptdir =~ s/\/[^\/]*$//;
 Log::Log4perl->init( $scriptdir . "/log4j.conf" );
@@ -24,32 +25,13 @@ sub run_script {
     my $script = shift;
     $logger->info("Running script:");
     $logger->info($script);
-
-    # system($script);
-    # if ( $? == -1 ) {
-    #     $logger->logdie("Failed to execute: $!\n");
-    # }
-    # elsif ( $? & 127 ) {
-    #     $logger->error(
-    #         sprintf(
-    #             "child died with signal %d, %s coredump\n",
-    #             ( $? & 127 ),
-    #             ( $? & 128 ) ? 'with' : 'without'
-    #         )
-    #     );
-    #     return 1;
-    # } ## end elsif ( $? & 127 )
-    # else {
-    #     if ( $? >> 8 != 0 ) {
-    #         $logger->error( sprintf( "child exited with value %d\n", $? >> 8 ) );
-    #         return 1;
-    #     }
-    # } ## end else [ if ( $? == -1 ) ]
     my $output = qx/$script/;
     return 1 unless defined $output;
     $logger->info($output);
-    return 1 unless ( $output =~ /\+\+\+\+\+\+\+\+\+\+/ );
-    return 0;
+    return 0 if ( $output =~ /\+\+\+\+\+\+\+\+\+\+/ );
+    $script_err_count++;
+    $logger->logdie("Too many script failures") if $script_err_count > 9;
+    return 1;
 } ## end sub run_script
 
 sub get_section_name {
@@ -133,7 +115,8 @@ sub process_episode {
     } ## end if ( run_script(...))
     $db->disconnect(0);
 } ## end sub process_episode
-my $last_key=0;
+my $last_key = 0;
+
 sub lock_episode {
     my ( $possible, $result, $id );
 
@@ -157,7 +140,7 @@ sub lock_episode {
         $result = $db->fetch_number(qq(select id from episode where id=$id for update nowait));
         if ( defined $result ) {
             $logger->debug("Locked and selected episode_id <$id>");
-			$last_key=$id;
+            $last_key = $id;
             return $id;
         }
     } ## end for ( my $n = 0; $n < @...)
