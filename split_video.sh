@@ -8,6 +8,7 @@ else
 	NAS_BASE=/Diskstation/Unix
 fi
 MP4_DIR=$NAS_BASE/Videos/Import
+
 SPLIT_FOLDER=~/work/Videos/Split
 OUTPUT_FOLDER=~/work/Videos/Processed
 WORK_FOLDER=~/work/tmp
@@ -45,6 +46,20 @@ function get_key_frames {
 		fail "sed on $tmp_file failed"
 	rm $tmp_file
 }
+
+flag=$MP4_DIR/$(hostname).flag
+echo hello>$flag 
+if [ $? -ne 0 ] ; then
+	tree -d ${NAS_BASE}
+	printf "Mounts\n___________________\n"
+	mount
+	printf "ls $MP4_DIR \n___________________\n"
+	ls -l $MP4_DIR|head -5
+	printf "env\n___________________\n"
+	env
+	fail "Cannot create $flag - make sure /usr/bin/env has full disk access"
+fi
+rm -f $flag || fail "Cannot remove $flag"
 
 while getopts "i:f:t:l:p:" c
 do
