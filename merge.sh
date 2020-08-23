@@ -54,7 +54,7 @@ output_file=$1
 test -d $MP4_DIR 	|| fail "MP4_DIR $MP4_DIR not found"
 PROCDIR=$NAS_BASE/Unix/Videos/Processed/$program
 mkdir -p $PROCDIR 	|| fail "Could not create folder $PROCDIR"
-flag=${PROC_DIR}/$(hostname).flag
+flag=${PROCDIR}/$(hostname).flag
 echo Hello>$flag 	|| fail "Could not create $flag"
 rm -f $flag 		|| fail "Could not remove $flag"
 
