@@ -43,6 +43,7 @@ my $high_values = 'ZZZZZZZZZZZ';
 sub delete {
     my ($self) = @_;
     $self->db->exec(qq(delete from raw_file where name= '$self->{name}'));
+    $self->db->disconnect(0);
     splice( @{ $self->{file} }, $self->{ptr}, 1 );
     $self->max_ptr( $self->{max_ptr} - 1 );
     my $n = $self->{ptr};
