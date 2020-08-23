@@ -101,6 +101,7 @@ if [ $start_time == "00:00:00.000" ] ; then
 		echo "We want the whole file, so just copying"
 		cp $input_file $output_file ||
 			fail "Unable to copy full file from $input_file to $output_file"
+		echo "$output_file created successfully ++++++++++"
 		exit 0
 	else
 		key_frame_secs=0.000
