@@ -150,7 +150,15 @@ sub lock_episode {
 #---------------------------------------------------------------------------------
 my $episode_id;
 my $section_id;
-my $counter = 0;
+my $counter    = 0;
+my $restarting = 0;
+
+sub ctrl_c {
+    $SIG{INT} = \&ctrl_c;
+    $logger->info("Launctl stop detected - closing after current action ......");
+    $restarting = 1;
+}
+$SIG{INT} = \&ctrl_c;
 while ( $counter < 30 ) {
     $counter++;
 
@@ -165,5 +173,6 @@ while ( $counter < 30 ) {
         next;
     }
     $db->disconnect(0);    # Commit
+    last if $restarting > 0;
     sleep 60;
 } ## end while ( $counter < 30 )
