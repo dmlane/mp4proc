@@ -11,7 +11,9 @@ function fail {
 	exit 2
 }
 
-# Check we have ffmpeg on the path
+
+
+# Check we have ffmpeg on the path 
 ffmpeg=$(type -P ffmpeg)
 test -z "$ffmpeg" && fail "Cannot find ffmpeg on the path"
 
@@ -25,9 +27,6 @@ fi
 MP4_DIR=$NAS_BASE/Unix/Videos/Import
 SPLIT_FOLDER=~/work/Videos/Split
 
-
-test -d $MP4_DIR || fail "MP4_DIR $MP4_DIR not found"
-#---------------------------------------------
 n=0
 file_count=0
 filter=""
@@ -49,6 +48,17 @@ test -z "$program" && fail "No program supplied"
 test -z "$series" && fail "No series supplied"
 test -z "$episode" && fail "No episode supplied"
 output_file=$1
+
+#---------------------------------------------------------------------
+# Check we have access to NAS 
+test -d $MP4_DIR 	|| fail "MP4_DIR $MP4_DIR not found"
+PROCDIR=$NAS_BASE/Unix/Videos/Processed/$program
+mkdir -p $PROCDIR 	|| fail "Could not create folder $PROCDIR"
+flag=${PROC_DIR}/$(hostname).flag
+echo Hello>$flag 	|| fail "Could not create $flag"
+rm -f $flag 		|| fail "Could not remove $flag"
+
+#---------------------------------------------------------------------
 echo "Creating $output_file ----------"
 OUTPUT_FOLDER=~/work/Videos/Processed
 WORK_FOLDER=~/work/tmp
@@ -103,8 +113,6 @@ if [ ! -f ${WORK_FOLDER}/$output_file ] ; then
 	mv -v $work_mp4  ${WORK_FOLDER}/$output_file
 fi
 
-PROCDIR=$NAS_BASE/Unix/Videos/Processed/$program
-mkdir -p $PROCDIR
 
 mv -fv ${WORK_FOLDER}/$output_file $PROCDIR/ 2>&1
 
