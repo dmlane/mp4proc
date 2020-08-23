@@ -30,11 +30,13 @@ SPLIT_FOLDER=~/work/Videos/Split
 n=0
 file_count=0
 filter=""
+cleanup_list=""
 while getopts "i:p:S:e:" c
 do
 	case $c in
 		i)	inputs="$inputs -i $SPLIT_FOLDER/$OPTARG"
 			filter="$filter[${file_count}:v:0] [${file_count}:a:0] "
+			cleanup_list="$cleanup_list $SPLIT_FOLDER/$OPTARG"
 			(( file_count++ ))
 			:;;
 		p)	program=$OPTARG;;
@@ -104,6 +106,7 @@ if [ ! -f $NoMeta ] ; then
 			 -c:v libx264 -preset $preset -crf $crf -c:a aac -b:a 160k $work_mp4
 	test $? -ne 0 && fail "Merge failed"
 	mv -v  $work_mp4 $NoMeta
+	rm -vf $cleanup_list
 fi
 
 # Add metadata
