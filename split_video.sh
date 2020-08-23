@@ -109,7 +109,7 @@ else
 	# Make sure we use key-frames for the start frame
 	frame_secs=$(awk 'BEGIN{FS=":"}{printf "%.3f\n" ,((($1*60)+$2)*60)+$3}' <<<$start_time)
 	frame_file=$WORK_FOLDER/${input_file##*/}.frames
-	find $WORK_FOLDER -name "*.frames" -mmin -120 -delete
+	find $WORK_FOLDER -name "*.frames" -mmin +120 -delete
     get_key_frames $input_file $frame_file
     key_frame_secs=$(awk "{if (\$1 <= $frame_secs)v=\$1}END {print v}" $frame_file)
 	test "$key_frame_secs" == "$frame_secs" ||
