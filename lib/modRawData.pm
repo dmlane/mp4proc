@@ -192,6 +192,7 @@ sub set {
     $self->id( $self->file->[$new_value]->{raw_file_id} );
     $files_remaining = $self->file->[$new_value]->{remaining};
     $self->name( $self->file->[$new_value]->{file} );
+    return if $self->{name} eq $high_values;
     $self->status( $self->file->[$new_value]->{raw_status} );
     $self->num_sections( $self->file->[$new_value]->{section_count} );
     $raw_id       = $self->id;
