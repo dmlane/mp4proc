@@ -11,6 +11,11 @@
 	  <string>/Users/dave/.scripts/bin/macos_launch.sh</string>
 	  <string>/Users/dave/dev/mp4proc/job_manager.pl</string>
 	</array>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
 	<key>StandardErrorPath</key>
 	<string>/tmp/net.dmlane.videos.job.err</string>
 	<key>StandardOutPath</key>
