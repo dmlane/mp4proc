@@ -116,7 +116,7 @@ sub process_episode {
     $db->disconnect(0);
 } ## end sub process_episode
 my $last_key   = 0;
-my $restarting = 0;
+our $restarting = 0;
 
 sub lock_episode {
     my ( $possible, $result, $id );
@@ -128,9 +128,11 @@ sub lock_episode {
     	select count(*) from episode where status<1 and coalesce(host,'$host')='$host'
     	)
     );
-    if ( $num_to_do < 0 ) {
-        $logger->info("No new records");
+	$logger->debug("$num_to_do records left to process");
+    if ( $num_to_do < 1 ) {
+        $logger->debug("No new records");
         $restarting = 1;
+		return;
     }
     $possible = $db->fetch(
         qq(select id from episode where status<1 and coalesce(host,'$host')='$host' and id > $last_key
@@ -162,12 +164,12 @@ my $episode_id;
 my $section_id;
 my $counter = 0;
 
-sub ctrl_c {
-    $SIG{INT} = \&ctrl_c;
-    $logger->info("Launctl stop detected - closing after current action ......");
-    $restarting = 1;
-}
-$SIG{INT} = \&ctrl_c;
+#sub ctrl_c {
+#    $SIG{INT} = \&ctrl_c;
+#    $logger->info("Launctl stop detected - closing after current action ......");
+#    $restarting = 1;
+#}
+#$SIG{INT} = \&ctrl_c;
 while ( $counter < 30 ) {
     $counter++;
 
@@ -176,12 +178,16 @@ while ( $counter < 30 ) {
 
     # Get next job entry ..........
     $episode_id = lock_episode();
+	$logger->info("restarting=$restarting");
+    last if $restarting > 0;
     if ( defined $episode_id ) {
         $counter = 0;
         process_episode($episode_id);
         next;
     }
     $db->disconnect(0);    # Commit
-    last if $restarting > 0;
     sleep 60;
 } ## end while ( $counter < 30 )
+$logger->info("Successful end of run ++++++++++");
+exit(0);
+
