@@ -115,7 +115,8 @@ sub process_episode {
     } ## end if ( run_script(...))
     $db->disconnect(0);
 } ## end sub process_episode
-my $last_key = 0;
+my $last_key   = 0;
+my $restarting = 0;
 
 sub lock_episode {
     my ( $possible, $result, $id );
@@ -129,7 +130,7 @@ sub lock_episode {
     );
     if ( $num_to_do < 0 ) {
         $logger->info("No new records");
-        exit 0;
+        $restarting = 1;
     }
     $possible = $db->fetch(
         qq(select id from episode where status<1 and coalesce(host,'$host')='$host' and id > $last_key
@@ -159,8 +160,7 @@ sub lock_episode {
 #---------------------------------------------------------------------------------
 my $episode_id;
 my $section_id;
-my $counter    = 0;
-my $restarting = 0;
+my $counter = 0;
 
 sub ctrl_c {
     $SIG{INT} = \&ctrl_c;
