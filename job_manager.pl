@@ -122,6 +122,15 @@ sub lock_episode {
 
     # Stupid MariaDB doesn't have skip locked, so we have to fudge it.
     #--> get next 3 records and try to lock each 1 in turn
+    my $num_to_do = $db->fetch_number(
+        qq(
+    	select count(*) from episode where status<1 and coalesce(host,'$host')='$host'
+    	)
+    );
+    if ( $num_to_do < 0 ) {
+        $logger->info("No new records");
+        exit 0;
+    }
     $possible = $db->fetch(
         qq(select id from episode where status<1 and coalesce(host,'$host')='$host' and id > $last_key
     		order by id limit 3

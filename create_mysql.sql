@@ -1,5 +1,8 @@
 create database if not exists videos;
 connect videos;
+create table if not exists marker (
+  marker int(11) unsigned not null default 0
+) ENGINE = InnoDB DEFAULT CHARSET = utf8 COLLATE = utf8_bin;
 CREATE TABLE if not exists program (
   id int(11) unsigned NOT NULL AUTO_INCREMENT, 
   name varchar(32) COLLATE utf8_bin DEFAULT '', 
@@ -94,6 +97,15 @@ select a.name program_name, b.series_number, c.episode_number, sum(d.end_time-d.
   left outer join section d on d.episode_id = c.id 
 group by a.name,b.series_number,c.episode_number;
 
+drop view if exists missing;
+create view missing as
+select a.name program_name, b.series_number, c.seq episode_number,d.id
+ from program a
+  left outer join series b on b.program_id = a.id 
+  left outer join seq_1_to_1000 c on 1 = 1 
+  left outer join episode d on d.series_id = b.id and d.episode_number=c.seq
+  where c.seq <= b.max_episodes
+  and d.id is null;
 
 drop view if exists orphan_mp4;
 create view orphan_mp4 as 
