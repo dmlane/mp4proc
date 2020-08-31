@@ -148,6 +148,7 @@ sub menu {
     $self->at( -2, 0, "" );
     $result = $chooser->choose( $arr, { prompt => 'Choose program or "q" for manual' } );
     return $result if defined $result;
+    $self->{term}->at(-2,0)->clreos();
     $result = $self->string( $prompt . " (ESC for default[$default])", $default );
     return $result if $result ne $escape;
     return $default;

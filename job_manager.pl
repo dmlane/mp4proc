@@ -115,7 +115,7 @@ sub process_episode {
     } ## end if ( run_script(...))
     $db->disconnect(0);
 } ## end sub process_episode
-my $last_key   = 0;
+my $last_key = 0;
 our $restarting = 0;
 
 sub lock_episode {
@@ -128,17 +128,20 @@ sub lock_episode {
     	select count(*) from episode where status<1 and coalesce(host,'$host')='$host'
     	)
     );
-	$logger->debug("$num_to_do records left to process");
+    $logger->debug("$num_to_do records left to process");
     if ( $num_to_do < 1 ) {
         $logger->debug("No new records");
         $restarting = 1;
-		return;
+        return;
     }
     $possible = $db->fetch(
         qq(select id from episode where status<1 and coalesce(host,'$host')='$host' and id > $last_key
     		order by id limit 3
     		)
     );
+    for ( my $n = 0; $n < 3; $n++ ) {
+        $possible->[$n]->{id} = -1 unless defined $possible->[$n]->{id};
+    }
     $logger->debug(
         sprintf(
             "Selected following possible episode ids %d, %d and %d",
@@ -148,7 +151,8 @@ sub lock_episode {
         )
     );
     for ( my $n = 0; $n < @{$possible}; $n++ ) {
-        $id     = $possible->[$n]->{id};
+        $id = $possible->[$n]->{id};
+        next if $id < 1;
         $result = $db->fetch_number(qq(select id from episode where id=$id for update nowait));
         if ( defined $result ) {
             $logger->debug("Locked and selected episode_id <$id>");
@@ -178,7 +182,7 @@ while ( $counter < 30 ) {
 
     # Get next job entry ..........
     $episode_id = lock_episode();
-	$logger->info("restarting=$restarting");
+    $logger->info("restarting=$restarting");
     last if $restarting > 0;
     if ( defined $episode_id ) {
         $counter = 0;
@@ -190,4 +194,3 @@ while ( $counter < 30 ) {
 } ## end while ( $counter < 30 )
 $logger->info("Successful end of run ++++++++++");
 exit(0);
-
