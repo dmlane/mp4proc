@@ -46,4 +46,16 @@ sub set {
     $section     = -1;
     return 0;
 } ## end sub set
+
+sub change_series_length {
+    my $max_episodes
+        = $scr->number(
+        sprintf( "How many <B>episodes</B> in <B>%s-s%2.2d</B>", $program, $series ), 0 );
+    return 1 unless defined $max_episodes;
+    $max_episode = $max_episodes;
+    $db->exec(
+        qq(update series set max_episodes=$max_episode
+                where program_id=$program_id and series_number=$series)
+    );
+} ## end sub change_series_length
 1;

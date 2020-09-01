@@ -64,7 +64,7 @@ ALL: while ( $action ne "\e" ) {
         );
 
         # @p   = ( '??', '??', '??' );
-        $msg = "&Program";
+        $msg = "&Maintenance &Program";
         if ( $program ne '#' ) {
 
             # $p[0] = $program;
@@ -102,6 +102,14 @@ ALL: while ( $action ne "\e" ) {
                     }
                 } ## end given
             } ## end when ('F')
+            when ('M') {
+                my $mmsg = "&Series-Length";
+                given ( $scr->get_char($mmsg) ) {
+                    when ('S') {
+                        $oSeries->change_series_length();
+                    }
+                }
+            } ## end when ('M')
             when ('P') {
                 next unless $oProgram->set() == 0;
             }
