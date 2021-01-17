@@ -41,7 +41,7 @@ function mac_packages {
 	brew_install mysql-client /usr/local/bin/mysql link
 	brew_install ffmpeg /usr/local/bin/ffmpeg 
 	brew_install mp4v2 /usr/local/bin/mp4chaps 
-	brew_install gpac /usr/local/opt/mp4box 
+	brew_install gpac /usr/local/bin/MP4Box 
 }
 
 function perl_install {
