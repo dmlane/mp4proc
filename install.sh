@@ -40,8 +40,8 @@ function mac_packages {
 		/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 	brew_install mysql-client /usr/local/bin/mysql link
 	brew_install ffmpeg /usr/local/bin/ffmpeg 
-
-
+	brew_install mp4v2 /usr/local/bin/mp4chaps 
+	brew_install gpac /usr/local/opt/mp4box 
 }
 
 function perl_install {

@@ -122,5 +122,5 @@ mv -fv ${WORK_FOLDER}/$output_file $PROCDIR/ 2>&1
 test $? -ne 0 && fail "Unable to move result to $PROCDIR/"
 rm -fv $NoMeta
 echo "$output_file created successfully ++++++++++"
-return 0
+exit 0
 
