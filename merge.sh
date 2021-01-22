@@ -103,7 +103,8 @@ rm -f $NoMeta 2>/dev/null
 if [ ! -f $NoMeta ] ; then
 	FFMPEG -loglevel warning -y $inputs -filter_complex "$filter" \
 			 -map "[v]" -map "[a]" \
-			 -c:v libx264 -preset $preset -crf $crf -c:a aac -b:a 160k $work_mp4
+			 -c:v libx264 -preset $preset -crf $crf -c:a aac -b:a 160k \
+			 -movflags faststart $work_mp4
 	test $? -ne 0 && fail "Merge failed"
 	mv -v  $work_mp4 $NoMeta
 	rm -vf $cleanup_list
