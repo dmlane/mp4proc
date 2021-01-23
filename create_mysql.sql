@@ -87,6 +87,29 @@ from
   left outer join episode c on c.series_id = b.id 
   left outer join section d on d.episode_id = c.id 
   left outer join raw_file e on e.id = d.raw_file_id;
+drop view if exists segments;
+create view segments as
+select 
+  a.name program_name, 
+  b.series_number, 
+  c.id episode_id, 
+  c.episode_number,
+  d.section_number, 
+  d.start_time, 
+  d.end_time,
+  convert(time_to_sec(d.start_time)*1000,UNSIGNED) seg_start_ms, 
+  convert(time_to_sec(d.end_time)*1000,UNSIGNED) seg_end_ms,
+  e.video_length,
+  convert(time_to_sec(e.video_length)*1000,UNSIGNED) raw_ms 
+ from 
+  program a 
+  left outer join series b on b.program_id = a.id 
+  left outer join episode c on c.series_id = b.id 
+  left outer join section d on d.episode_id = c.id 
+  left outer join raw_file e on e.id = d.raw_file_id;
+
+
+
 
 drop view if exists summary;
 create view summary as 
