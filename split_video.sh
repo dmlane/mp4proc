@@ -47,6 +47,12 @@ function get_key_frames {
 	rm $tmp_file
 }
 
+for required in ffmpeg ffprobe
+do
+	command -v $required >/dev/null || fail "$required not installed"
+done
+
+
 flag=$MP4_DIR/$(hostname).flag
 echo hello>$flag 
 if [ $? -ne 0 ] ; then
