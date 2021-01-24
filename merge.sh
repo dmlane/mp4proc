@@ -11,7 +11,10 @@ function fail {
 	exit 2
 }
 
-
+# Portable way to get real path .......
+readlinkf(){ perl -MCwd -e 'print Cwd::abs_path shift' "$1";}
+myscript="$(readlinkf $0)"
+bindir=$(dirname $myscript)
 
 # Check we have ffmpeg on the path 
 ffmpeg=$(type -P ffmpeg)
@@ -76,19 +79,9 @@ title=${output_file%.mp4}
 
 # Define metadata
 # 
-cat >${SPLIT_FOLDER}/metadata.txt<<EOF
-;FFMETADATA1
-major_brand=isom
-minor_version=512
-compatible_brands=isomiso2avc1mp41
-title=$title
-episode_sort=$episode
-show=$program
-episode_id=$episode_id
-season_number=$series
-media_type=10
-encoder=Lavf58.20.100
-EOF
+
+${bindir}/gen_metadata.pl -p $program -s $series -e $episode >${SPLIT_FOLDER}/metadata.txt
+test $? -ne 0 && fail "gen_metadata failed"
 
 ffmpeg=$(type -P ffmpeg)
 

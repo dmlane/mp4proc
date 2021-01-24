@@ -79,10 +79,11 @@ encoder=Lavf58.20.100
     $chap{$chapter}->{end}++;
     for ( my $n = 1; $n <= $chapter; $n++ ) {
         printf(
-            "[CHAPTER]\nTIMEBASE=1/1000\nTITLE=%s-%2.2d\nSTART=%d\nEND=%d\n\n",
-            $title, $n,
+            "[CHAPTER]\nTIMEBASE=1/1000\nSTART=%d\nEND=%d\nTITLE=%s-%2.2d\n\n",
             $chap{$n}->{start},
-            $chap{$n}->{end}
+            $chap{$n}->{end},
+            $title,
+			$n
         );
     } ## end for ( my $n = 1; $n <= ...)
 } ## end sub print_meta

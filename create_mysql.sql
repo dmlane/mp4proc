@@ -208,7 +208,7 @@ end; //
 DELIMITER ;
 
 DELIMITER //
-create trigger au_section 
+create or replace trigger au_section 
   after update on section
   for each row
 begin
