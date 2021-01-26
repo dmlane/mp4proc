@@ -147,7 +147,7 @@ fi
 $bindir/check_file_finished.pl $input_file 
 if [ $? -eq 0 ] ; then
 	echo "$frame_file no longer needed - deleting"
-	rm -f $frame_file
+	rm -fv $frame_file
 fi
 
 echo "$output_file created successfully ++++++++++"
