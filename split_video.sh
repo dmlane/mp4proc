@@ -130,7 +130,7 @@ fi
 
 tmp_file=${output_file/.mp4/_temp.mp4}
 test -f $tmp_file && rm -f $tmp_file
-echo "Processing $mp4_file (-ss=${key_frame_secs} -to=$end_time)"
+echo "Processing $input_file (-ss=${key_frame_secs} -to=$end_time)"
 ffmpeg -loglevel warning -y -i ${input_file} -ss ${key_frame_secs} -to $end_time \
 	-c copy $tmp_file
 if [ $? -ne 0 ] ; then
@@ -144,10 +144,12 @@ if [ $? -ne 0 ] ; then
 	rm -f $tmp_file
 	fail "Could not move $tmp_file to $output_file"
 fi
-$bindir/check_file_finished.pl $input_file 
-if [ $? -eq 0 ] ; then
-	echo "$frame_file no longer needed - deleting"
-	rm -f $frame_file
+if [ ! -z "$frame_file"] ; then
+	$bindir/check_file_finished.pl $input_file 
+	if [ $? -eq 0 ] ; then
+		echo "$frame_file no longer needed - deleting"
+		rm -f $frame_file
+	fi
 fi
 
 echo "$output_file created successfully ++++++++++"
