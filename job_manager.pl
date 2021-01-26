@@ -127,6 +127,7 @@ our $restarting = 0;
 
 sub lock_episode {
     my ( $possible, $result, $id );
+    my $cache_size = 6;
 
     # Stupid MariaDB doesn't have skip locked, so we have to fudge it.
     #--> get next 3 records and try to lock each 1 in turn
@@ -143,20 +144,21 @@ sub lock_episode {
     }
     $possible = $db->fetch(
         qq(select id from episode where status<1 and coalesce(host,'$host')='$host' and id > $last_key
-            order by id limit 3
+            order by -host desc,id limit $cache_size
             )
     );
-    for ( my $n = 0; $n < 3; $n++ ) {
-        $possible->[$n]->{id} = -1 unless defined $possible->[$n]->{id};
-    }
-    $logger->debug(
-        sprintf(
-            "Selected following possible episode ids %d, %d and %d",
-            $possible->[0]->{id},
-            $possible->[1]->{id},
-            $possible->[2]->{id}
-        )
-    );
+    my $msg = "Selected following possible episode ids ";
+    for ( my $n = 0; $n < $cache_size; $n++ ) {
+        if ( defined $possible->[$n]->{id} ) {
+            $msg = sprintf( "$msg %d,", $possible->[$n]->{id} );
+        }
+        else {
+            $possible->[$n]->{id} = -1;
+        }
+    } ## end for ( my $n = 0; $n < $cache_size...)
+    $msg=~s/,$//;
+    $msg =~ s/\,([^,]*)$/ and$1/;
+    $logger->debug($msg);
     for ( my $n = 0; $n < @{$possible}; $n++ ) {
         $id = $possible->[$n]->{id};
         next if $id < 1;
@@ -165,6 +167,9 @@ sub lock_episode {
             $logger->debug("Locked and selected episode_id <$id>");
             $last_key = $id;
             return $id;
+        }
+        else {
+            $logger->debug("episode_id <$id> is locked - skipping");
         }
     } ## end for ( my $n = 0; $n < @...)
     return;
@@ -185,7 +190,7 @@ my $flag = "/tmp/mp4proc.stop";
 while ( $counter < 30 ) {
     if ( -e $flag ) {
         unlink $flag;
-		$logger->info("$flag found, so exiting");
+        $logger->info("$flag found, so exiting");
         exit(0);
     }
     $counter++;
