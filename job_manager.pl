@@ -21,6 +21,12 @@ Log::Log4perl->init( $scriptdir . "/log4j.conf" );
 my $logger = get_logger("jobsched");
 $logger->info("Start of run");
 
+sub ffmpeg_version {
+    my $res = `ffmpeg -version`;
+    $res =~ /ffmpeg version ([0-9\.]*).*/;
+    return $1;
+}
+
 sub run_script {
     my $script = shift;
     $logger->info("Running script:");
@@ -85,6 +91,7 @@ sub process_section {
 sub process_episode {
     my $episode_id = shift;
     my $ifiles     = "";
+    my $fversion   = ffmpeg_version();
 
     # Process sections
     my $status = process_section($episode_id);
@@ -111,7 +118,7 @@ sub process_episode {
         ) == 0
         )
     {
-        $db->exec(qq(update episode set status=1 where id=$episode_id));
+        $db->exec(qq(update episode set status=1,ffmpeg_version='$fversion' where id=$episode_id));
     } ## end if ( run_script(...))
     $db->disconnect(0);
 } ## end sub process_episode
