@@ -25,10 +25,11 @@ our %env_params = (
 );
 
 # Class variables
-has conf      => ( is => 'rw' );
-has connected => ( is => 'rw', default => 0 );
-has dbh       => ( is => 'rw', default => "" );
-has level     => ( is => 'rw', default => 'TEST' );
+has conf        => ( is => 'rw' );
+has connected   => ( is => 'rw', default => 0 );
+has dbh         => ( is => 'rw', default => "" );
+has level       => ( is => 'rw', default => 'TEST' );
+has catch_error => ( is => 'rw', default => 1 );
 
 =head2 read_params
 Fetch the parameters from a parameter file using mysql utility. In MariaDB,
@@ -73,7 +74,7 @@ sub BUILD {
         sleep(2);
     }
     $self->conf($conf);
- } ## end sub BUILD
+} ## end sub BUILD
 
 sub connect {
     my $self = shift;
@@ -118,7 +119,7 @@ sub exec {
     $self->connect() if $conn == 0;
     try {
         my $sth = $self->dbh->prepare($stmt);
-        $sth->execute()  ;
+        $sth->execute();
     }
     catch {
         die ">>>Error found executing\n---\n$stmt\n---\n";
@@ -126,6 +127,11 @@ sub exec {
     $self->disconnect() if $conn == 0;
     return $results;
 } ## end sub exec
+
+sub ignore_error {
+    my ($self) = @_;
+    $self->catch_error(0);
+}
 
 =head2 fetch
 Fetch the results of the select provided into a hash array
@@ -142,7 +148,9 @@ sub fetch {
         $results = $sth->fetchall_arrayref( {} );
     }
     catch {
-        die ">>>Error found executing\n---\n$stmt\n---\n";
+        die ">>>Error found executing\n---\n$stmt\n---\n"
+            unless $self->{catch_error} eq 0;
+        $self->catch_error(1);
     };
     $self->disconnect() if $conn == 0;
     return $results;

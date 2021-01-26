@@ -162,6 +162,7 @@ sub lock_episode {
     for ( my $n = 0; $n < @{$possible}; $n++ ) {
         $id = $possible->[$n]->{id};
         next if $id < 1;
+        $db->ignore_error();
         $result = $db->fetch_number(qq(select id from episode where id=$id for update nowait));
         if ( defined $result ) {
             $logger->debug("Locked and selected episode_id <$id>");
