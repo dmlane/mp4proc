@@ -185,6 +185,7 @@ my $flag = "/tmp/mp4proc.stop";
 while ( $counter < 30 ) {
     if ( -e $flag ) {
         unlink $flag;
+		$logger->info("$flag found, so exiting");
         exit(0);
     }
     $counter++;
