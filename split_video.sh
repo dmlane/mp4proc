@@ -144,7 +144,7 @@ if [ $? -ne 0 ] ; then
 	rm -f $tmp_file
 	fail "Could not move $tmp_file to $output_file"
 fi
-if [ ! -z "$frame_file"] ; then
+if [ ! -z "$frame_file" ] ; then
 	$bindir/check_file_finished.pl $input_file 
 	if [ $? -eq 0 ] ; then
 		echo "$frame_file no longer needed - deleting"
