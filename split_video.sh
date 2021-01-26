@@ -35,7 +35,7 @@ function get_key_frames {
 	local tmp_file=$WORK_FOLDER/ffprobe.txt
     test -s $frame_file || rm -f $frame_file
     if [ $mp4_file -ot $frame_file ] ; then
-		echo "Using cached frame file as key framesfor $mp4_file"
+		echo "Using cached frame file as key frames for $mp4_file"
 		return
 	fi
 	echo "Fetching key frames from $mp4_file"
@@ -138,6 +138,11 @@ if [ $? -ne 0 ] ; then
 	ls -l $tmp_file
 	rm -f $tmp_file
 	fail "Could not move $tmp_file to $output_file"
+fi
+check_file_finished.pl $input_file 
+if [ $? -eq 0 ] ; then
+	echo "$frame_file no longer needed - deleting"
+	rm -f $frame_file
 fi
 
 echo "$output_file created successfully ++++++++++"
