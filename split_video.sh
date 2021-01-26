@@ -35,7 +35,7 @@ function get_key_frames {
 	local tmp_file=$WORK_FOLDER/ffprobe.txt
     test -s $frame_file || rm -f $frame_file
     if [ $mp4_file -ot $frame_file ] ; then
-		echo "Using cached frame file for $mp4_file"
+		echo "Using cached frame file as key framesfor $mp4_file"
 		return
 	fi
 	echo "Fetching key frames from $mp4_file"
