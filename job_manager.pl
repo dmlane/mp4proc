@@ -46,16 +46,16 @@ sub process_section {
     my $ok_count   = 0;
     my $info       = $db->fetch(
         qq(
-    	select 	a.name program_name,b.series_number,c.episode_number,d.id section_id,
-    			d.section_number,d.start_time,d.end_time,d.status,
+        select  a.name program_name,b.series_number,c.episode_number,d.id section_id,
+                d.section_number,d.start_time,d.end_time,d.status,
                 e.name file_name,e.video_length
-    	from program a 
-			 left outer join series b on b.program_id = a.id 
-			 left outer join episode c on c.series_id = b.id 
-			 left outer join section d on d.episode_id = c.id 
-			 left outer join raw_file e on e.id = d.raw_file_id
-			 where c.id=$episode_id and d.status=0;
-    	)
+        from program a 
+             left outer join series b on b.program_id = a.id 
+             left outer join episode c on c.series_id = b.id 
+             left outer join section d on d.episode_id = c.id 
+             left outer join raw_file e on e.id = d.raw_file_id
+             where c.id=$episode_id and d.status=0;
+        )
     );
 
     # Make sure we process all sections and episode on same machine
@@ -92,10 +92,10 @@ sub process_episode {
 
     # Get a list of files to process
     my $result = $db->fetch(
-        qq	(select episode_id, section_number, start_time, end_time,
-        		video_length,file_name,program_name,series_number,episode_number
-        		from videos where episode_id=$episode_id
-        		order by section_number)
+        qq  (select episode_id, section_number, start_time, end_time,
+                video_length,file_name,program_name,series_number,episode_number
+                from videos where episode_id=$episode_id
+                order by section_number)
     );
     for ( my $n = 0; $n < @{$result}; $n++ ) {
         $ifiles = $ifiles . " -i " . get_section_name( $result->[$n] );
@@ -125,8 +125,8 @@ sub lock_episode {
     #--> get next 3 records and try to lock each 1 in turn
     my $num_to_do = $db->fetch_number(
         qq(
-    	select count(*) from episode where status<1 and coalesce(host,'$host')='$host'
-    	)
+        select count(*) from episode where status<1 and coalesce(host,'$host')='$host'
+        )
     );
     $logger->debug("$num_to_do records left to process");
     if ( $num_to_do < 1 ) {
@@ -136,8 +136,8 @@ sub lock_episode {
     }
     $possible = $db->fetch(
         qq(select id from episode where status<1 and coalesce(host,'$host')='$host' and id > $last_key
-    		order by id limit 3
-    		)
+            order by id limit 3
+            )
     );
     for ( my $n = 0; $n < 3; $n++ ) {
         $possible->[$n]->{id} = -1 unless defined $possible->[$n]->{id};
@@ -174,7 +174,12 @@ my $counter = 0;
 #    $restarting = 1;
 #}
 #$SIG{INT} = \&ctrl_c;
+my $flag = "/tmp/mp4proc.stop";
 while ( $counter < 30 ) {
+    if ( -e $flag ) {
+        unlink $flag;
+        exit(0);
+    }
     $counter++;
 
     # Start transaction
