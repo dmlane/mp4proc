@@ -144,12 +144,19 @@ if [ $? -ne 0 ] ; then
 	rm -f $tmp_file
 	fail "Could not move $tmp_file to $output_file"
 fi
+<<<<<<< HEAD
 if [ ! -z "$frame_file"] ; then
 	$bindir/check_file_finished.pl $input_file 
 	if [ $? -eq 0 ] ; then
 		echo "$frame_file no longer needed - deleting"
 		rm -f $frame_file
 	fi
+=======
+$bindir/check_file_finished.pl $input_file 
+if [ $? -eq 0 ] ; then
+	echo "$frame_file no longer needed - deleting"
+	rm -fv $frame_file
+>>>>>>> 0461fa8103d6bccc18f79f2cdbe1aa2b49d7907a
 fi
 
 echo "$output_file created successfully ++++++++++"
