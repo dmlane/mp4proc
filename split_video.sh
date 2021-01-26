@@ -52,6 +52,11 @@ do
 	command -v $required >/dev/null || fail "$required not installed"
 done
 
+# Portable way to get real path .......
+readlinkf(){ perl -MCwd -e 'print Cwd::abs_path shift' "$1";}
+myscript="$(readlinkf $0)"
+bindir=$(dirname $myscript)
+
 
 flag=$MP4_DIR/$(hostname).flag
 echo hello>$flag 
@@ -139,7 +144,7 @@ if [ $? -ne 0 ] ; then
 	rm -f $tmp_file
 	fail "Could not move $tmp_file to $output_file"
 fi
-check_file_finished.pl $input_file 
+$bindir/check_file_finished.pl $input_file 
 if [ $? -eq 0 ] ; then
 	echo "$frame_file no longer needed - deleting"
 	rm -f $frame_file
