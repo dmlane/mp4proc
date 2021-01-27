@@ -88,6 +88,7 @@ done
 shift $((OPTIND-1))
 test $# -lt 1 && fail "No output file provided"
 output_file=$SPLIT_FOLDER/$1
+tmp_file=$SPLIT_FOLDER/temporary.mp4
 
 test -z "$input_file" && usage
 test -z "$output_file" && usage
@@ -128,7 +129,7 @@ else
 		echo "Adjusting start time from $frame_secs to $key_frame_secs to be on a key frame"
 fi
 
-tmp_file=${output_file/.mp4/_temp.mp4}
+#tmp_file=${output_file/.mp4/_temp.mp4}
 test -f $tmp_file && rm -f $tmp_file
 echo "Processing $input_file (-ss=${key_frame_secs} -to=$end_time)"
 ffmpeg -loglevel warning -y -i ${input_file} -ss ${key_frame_secs} -to $end_time \
