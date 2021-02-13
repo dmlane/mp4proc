@@ -34,6 +34,7 @@ function linux_packages {
 	# exist, so this should work ....
 	apt_install perl-doc 
 	apt_install libmariadb-dev
+	apt_install ffmpeg
 }
 function mac_packages {
 	test -f /usr/local/bin/brew ||\
